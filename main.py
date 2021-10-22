@@ -70,6 +70,7 @@ def main():
             "gis_join": gis_join,
             "collections_supported": collections_found_in
         })
+        index += 1
 
 
 if __name__ == '__main__':
