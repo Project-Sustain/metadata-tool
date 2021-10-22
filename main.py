@@ -27,6 +27,8 @@ def main():
 
             if "GISJOIN" in first_record.keys():
                 print(f"GISJOIN in {collection_name}")
+            elif "gis_join" in first_record.keys():
+                print(f"gis_join in {collection_name}")
             elif "properties" in first_record.keys():
                 if "GISJOIN" in first_record["properties"].keys():
                     print(f"properties.GISJOIN in {collection_name}")
