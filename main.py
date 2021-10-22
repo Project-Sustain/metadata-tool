@@ -14,7 +14,7 @@ def load_state_gis_joins():
 
 
 def exists_in_collection(field, gis_join, collection):
-    return collection.find_one({field: {"$regex": f"{gis_join}.*"}}).count() > 0
+    return collection.find_one({field: {"$regex": f"{gis_join}.*"}}).count() is not None
 
 
 def main():
