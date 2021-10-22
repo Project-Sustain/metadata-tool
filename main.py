@@ -45,16 +45,16 @@ def main():
         collection = db[collection_name]
         found = False
 
-        for gis_join in gis_joins:
-            # Add empty list if no entry exists yet
-            if gis_join not in collections_supported_by_gis_join:
-                collections_supported_by_gis_join[gis_join] = []
+        found_in_field = get_gis_join_field(collection)
+        if found_in_field:
+            for gis_join in gis_joins:
+                # Add empty list if no entry exists yet
+                if gis_join not in collections_supported_by_gis_join:
+                    collections_supported_by_gis_join[gis_join] = []
 
-            found_in_field = get_gis_join_field(collection)
-            if found_in_field:
-                if exists_in_collection(found_in_field, gis_join, collection):
-                    collections_supported_by_gis_join[gis_join].append(collection_name)
-                    found = True
+                    if exists_in_collection(found_in_field, gis_join, collection):
+                        collections_supported_by_gis_join[gis_join].append(collection_name)
+                        found = True
 
             print("Found:", found)
 
