@@ -20,15 +20,15 @@ def exists_in_collection(field, gis_join, collection):
 
 def get_gis_join_field(collection):
     first_record = collection.find_one()
-    if "GISJOIN" in first_record.keys():
-        return "GISJOIN"
-    elif "gis_join" in first_record.keys():
-        return "gis_join"
-    elif "properties" in first_record.keys():
-        if "GISJOIN" in first_record["properties"].keys():
-            return "properties.GISJOIN"
-    else:
-        return None
+    if first_record:
+        if "GISJOIN" in first_record.keys():
+            return "GISJOIN"
+        elif "gis_join" in first_record.keys():
+            return "gis_join"
+        elif "properties" in first_record.keys():
+            if "GISJOIN" in first_record["properties"].keys():
+                return "properties.GISJOIN"
+    return None
 
 
 def main():
