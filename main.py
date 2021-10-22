@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from pprint import pprint
 
 
 def load_state_gis_joins():
@@ -7,7 +8,7 @@ def load_state_gis_joins():
         lines = f.readlines()
         for line in lines:
             if line.strip():
-                gis_joins.append(line)
+                gis_joins.append(line.strip())
 
     return gis_joins
 
@@ -18,10 +19,12 @@ def main():
     db = client[database_name]
     collection_names = db.list_collection_names()
     gis_joins = load_state_gis_joins()
-    for collection_name in collection_names:
-        print(f"Collection: {collection_name}")
 
-    print(gis_joins)
+    for gis_join in gis_joins:
+        for collection_name in collection_names:
+            collection = db[collection_name]
+            pprint(collection.find_one())
+        break
 
 
 if __name__ == '__main__':
