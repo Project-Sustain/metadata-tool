@@ -13,6 +13,10 @@ def load_state_gis_joins():
     return gis_joins
 
 
+def exists_in_collection(field, gis_join, collection):
+    return collection.find({field: {"$regex": f"{gis_join}.*"}}).count() > 0
+
+
 def main():
     client = MongoClient("mongodb://lattice-100:27018")
     database_name = "sustaindb"
@@ -20,19 +24,30 @@ def main():
     collection_names = db.list_collection_names()
     gis_joins = load_state_gis_joins()
 
-    for gis_join in gis_joins:
-        for collection_name in collection_names:
-            collection = db[collection_name]
-            first_record = collection.find_one()
+    collections_supported_by_gis_join = {}
+
+    for collection_name in collection_names:
+        collection = db[collection_name]
+        first_record = collection.find_one()
+
+        for gis_join in gis_joins:
+
+            collections_supported_by_gis_join[gis_join] = []
 
             if "GISJOIN" in first_record.keys():
-                print(f"GISJOIN in {collection_name}")
+                if exists_in_collection("GISJOIN", gis_join, collection):
+                    collections_supported_by_gis_join[gis_join].append(collection_name)
+
             elif "gis_join" in first_record.keys():
-                print(f"gis_join in {collection_name}")
+                if exists_in_collection("gis_join", gis_join, collection):
+                    collections_supported_by_gis_join[gis_join].append(collection_name)
+
             elif "properties" in first_record.keys():
                 if "GISJOIN" in first_record["properties"].keys():
-                    print(f"properties.GISJOIN in {collection_name}")
-        break
+                    if exists_in_collection("properties.GISJOIN", gis_join, collection):
+                        collections_supported_by_gis_join[gis_join].append(collection_name)
+
+    print(collections_supported_by_gis_join)
 
 
 if __name__ == '__main__':
