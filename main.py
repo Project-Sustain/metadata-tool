@@ -52,9 +52,9 @@ def main():
                 if gis_join not in collections_supported_by_gis_join:
                     collections_supported_by_gis_join[gis_join] = []
 
-                    if exists_in_collection(found_in_field, gis_join, collection):
-                        collections_supported_by_gis_join[gis_join].append(collection_name)
-                        found = True
+                if exists_in_collection(found_in_field, gis_join, collection):
+                    collections_supported_by_gis_join[gis_join].append(collection_name)
+                    found = True
 
             print("Found:", found)
 
