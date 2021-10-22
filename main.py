@@ -23,7 +23,9 @@ def main():
     for gis_join in gis_joins:
         for collection_name in collection_names:
             collection = db[collection_name]
-            pprint(collection.find_one())
+            first_record = collection.find_one()
+
+            pprint(first_record.keys())
         break
 
 
