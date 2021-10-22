@@ -26,9 +26,9 @@ def main():
 
     collections_supported_by_gis_join = {}
 
-    for collection_name in collection_names:
+    for collection_name in sorted(collection_names):
         print(f"Evaluating collection {collection_name}...")
-        collection = db[sorted(collection_name)]
+        collection = db[collection_name]
         first_record = collection.find_one()
 
         for gis_join in gis_joins:
