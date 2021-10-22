@@ -41,6 +41,9 @@ def main():
     collections_supported_by_gis_join = {}
 
     for collection_name in sorted(collection_names):
+        if collection_name == "state_gis_join_metadata":
+            continue
+
         print(f"Evaluating collection {collection_name}...")
         collection = db[collection_name]
         found = False
@@ -65,11 +68,15 @@ def main():
     index = 0
     for gis_join in sorted(gis_joins):
         collections_found_in = collections_supported_by_gis_join[gis_join]
-        metadata_collection.insert_one({
-            "_id": index,
-            "gis_join": gis_join,
-            "collections_supported": collections_found_in
-        })
+        metadata_collection.replace_one(
+            {"_id": index},
+            {
+                "_id": index,
+                "gis_join": gis_join,
+                "collections_supported": collections_found_in
+            },
+            upsert=True
+        )
         index += 1
 
 
