@@ -14,7 +14,8 @@ def load_state_gis_joins():
 
 
 def exists_in_collection(field, gis_join, collection):
-    return collection.find_one({field: {"$regex": f"{gis_join}.*"}}) is not None
+    print(f"Searching for .*{gis_join}.* in field {field}")
+    return collection.find_one({field: {"$regex": f".*{gis_join}.*"}}) is not None
 
 
 def main():
@@ -32,21 +33,27 @@ def main():
         first_record = collection.find_one()
 
         for gis_join in gis_joins:
-            print(f"\tGISJOIN {gis_join}")
             collections_supported_by_gis_join[gis_join] = []
+
+            found = False
 
             if "GISJOIN" in first_record.keys():
                 if exists_in_collection("GISJOIN", gis_join, collection):
                     collections_supported_by_gis_join[gis_join].append(collection_name)
+                    found = True
 
             elif "gis_join" in first_record.keys():
                 if exists_in_collection("gis_join", gis_join, collection):
+                    found = True
                     collections_supported_by_gis_join[gis_join].append(collection_name)
 
             elif "properties" in first_record.keys():
                 if "GISJOIN" in first_record["properties"].keys():
                     if exists_in_collection("properties.GISJOIN", gis_join, collection):
+                        found = True
                         collections_supported_by_gis_join[gis_join].append(collection_name)
+
+            print("Found:", found)
 
     print(collections_supported_by_gis_join)
 
