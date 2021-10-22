@@ -14,7 +14,7 @@ def load_state_gis_joins():
 
 
 def exists_in_collection(field, gis_join, collection):
-    return collection.find({field: {"$regex": f"{gis_join}.*"}}).count() > 0
+    return collection.findOne({field: {"$regex": f"{gis_join}.*"}}).count() > 0
 
 
 def main():
@@ -27,11 +27,12 @@ def main():
     collections_supported_by_gis_join = {}
 
     for collection_name in collection_names:
-        collection = db[collection_name]
+        print(f"Evaluating collection {collection_name}...")
+        collection = db[sorted(collection_name)]
         first_record = collection.find_one()
 
         for gis_join in gis_joins:
-
+            print(f"\tGISJOIN {gis_join}")
             collections_supported_by_gis_join[gis_join] = []
 
             if "GISJOIN" in first_record.keys():
