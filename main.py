@@ -25,7 +25,11 @@ def main():
             collection = db[collection_name]
             first_record = collection.find_one()
 
-            pprint(first_record.keys())
+            if "GISJOIN" in first_record.keys():
+                print(f"GISJOIN in {collection_name}")
+            elif "properties" in first_record.keys():
+                if "GISJOIN" in first_record["properties"].keys():
+                    print(f"properties.GISJOIN in {collection_name}")
         break
 
 
