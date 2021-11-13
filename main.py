@@ -136,7 +136,7 @@ def test():
 
 
 def main():
-    gis_joins = load_state_gis_joins()
+    gis_joins = [x["GISJOIN"] for x in load_state_gis_joins()]
     db, collections_supported_by_gis_join = search_collections_for_gis_joins(gis_joins)
     create_or_replace_metadata_collection(db, gis_joins, collections_supported_by_gis_join)
 
