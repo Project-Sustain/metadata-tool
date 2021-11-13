@@ -89,11 +89,22 @@ def test():
     client = MongoClient("mongodb://lattice-100:27018")
     database_name = "sustaindb"
     db = client[database_name]
-    collection = db["state_geo"]
+    state_geo_collection = db["state_geo"]
     test_gis_join = "G480"
-    document = collection.find_one({"properties.GISJOIN": test_gis_join})
-    state_geometry = document["geometry"]
-    print(state_geometry["type"])
+    state_document = state_geo_collection.find_one({"properties.GISJOIN": test_gis_join})
+    state_geometry = state_document["geometry"]
+    test_collection = db["CaliforniaHSRail"]
+    found = test_collection.find_one({
+        "geometry": {
+            "$geoIntersects": {
+                "$geometry": {
+                    "type": state_geometry["type"],
+                    "coordinates": state_geometry["coordinates"]
+                }
+            }
+        }
+    })
+    pprint(found)
 
 
 def main():
