@@ -13,6 +13,7 @@ def search_collections_for_gis_joins(gis_joins):
     database_name = "sustaindb"
     db = client[database_name]
     collection_names = db.list_collection_names()
+    state_geo_collection = db["state_geo"]
 
     # Mapping of gis_join -> [ list of collections ]
     collections_supported_by_gis_join = {}
@@ -41,17 +42,44 @@ def search_collections_for_gis_joins(gis_joins):
                     collections_supported_by_gis_join[gis_join].append(collection_name)
                     found = True
 
-        else: # No GISJOIN field, check $geoIntersects
+        # No GISJOIN field, check $geoIntersects
+        else:
 
             # Iterate over all GISJOINs and see if the state's geometry intersects any documents' geometries
             for gis_join in gis_joins:
+                state_document = state_geo_collection.find_one({"properties.GISJOIN": gis_join})
 
-                state_geo_document = collection.find({"properties.GISJOIN": gis_join})
+                # Add empty list if no entry exists yet
+                if gis_join not in collections_supported_by_gis_join:
+                    collections_supported_by_gis_join[gis_join] = []
+
+                if intersects_with_collection("geometry", state_document, collection):
+                    collections_supported_by_gis_join[gis_join].append(collection_name)
+                    found = True
+
+        print("Found:", found)
+
+    return db, collections_supported_by_gis_join
 
 
 def exists_in_collection(field, gis_join, collection):
     print(f"Searching for .*{gis_join}.* in field {field}")
     return collection.find_one({field: {"$regex": f".*{gis_join}.*"}}) is not None
+
+
+def intersects_with_collection(field, state_geo_document, collection):
+    state_geometry = state_geo_document["geometry"]
+    found = collection.find_one({
+        field: {
+            "$geoIntersects": {
+                "$geometry": {
+                    "type": state_geometry["type"],
+                    "coordinates": state_geometry["coordinates"]
+                }
+            }
+        }
+    })
+    return found is not None
 
 
 def get_gis_join_field(collection):
@@ -108,10 +136,9 @@ def test():
 
 
 def main():
-    #gis_joins = load_state_gis_joins()
-    #for gis_join in gis_joins:
-    #    print(gis_join["GISJOIN"])
-    test()
+    gis_joins = load_state_gis_joins()
+    db, collections_supported_by_gis_join = search_collections_for_gis_joins(gis_joins)
+    create_or_replace_metadata_collection(db, gis_joins, collections_supported_by_gis_join)
 
 
 if __name__ == '__main__':
