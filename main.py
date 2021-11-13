@@ -90,7 +90,7 @@ def test():
     database_name = "sustaindb"
     db = client[database_name]
     state_geo_collection = db["state_geo"]
-    test_gis_join = "G480"
+    test_gis_join = "G060"
     state_document = state_geo_collection.find_one({"properties.GISJOIN": test_gis_join})
     state_geometry = state_document["geometry"]
     test_collection = db["CaliforniaHSRail"]
