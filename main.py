@@ -91,9 +91,9 @@ def test():
     db = client[database_name]
     collection = db["state_geo"]
     test_gis_join = "G480"
-    cursor = collection.find({"properties.GISJOIN": test_gis_join})
-    for document in cursor:
-        pprint(document)
+    document = collection.find_one({"properties.GISJOIN": test_gis_join})
+    state_geometry = document["geometry"]
+    print(state_geometry["type"])
 
 
 def main():
