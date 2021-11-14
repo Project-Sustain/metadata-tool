@@ -25,12 +25,11 @@ def search_collections_for_gis_joins(gis_joins):
 
         print(f"Evaluating collection {collection_name}...")
         collection = db[collection_name]
-        found = False
 
         # Determine if there is a GISJOIN field
         found_in_field = get_gis_join_field(collection)
         if found_in_field:
-
+            found = False
             # Iterate over all GISJOINs and see if there are any records with that GISJOIN in the collection
             for gis_join in gis_joins:
 
@@ -42,11 +41,14 @@ def search_collections_for_gis_joins(gis_joins):
                     collections_supported_by_gis_join[gis_join].append(collection_name)
                     found = True
 
+                print(f"{collection}: Found {gis_join}: {found}")
+
         # No GISJOIN field, check $geoIntersects
-        else:
+        elif has_geometry_field(collection):
 
             # Iterate over all GISJOINs and see if the state's geometry intersects any documents' geometries
             for gis_join in gis_joins:
+                found = False
                 state_document = state_geo_collection.find_one({"properties.GISJOIN": gis_join})
 
                 # Add empty list if no entry exists yet
@@ -57,7 +59,7 @@ def search_collections_for_gis_joins(gis_joins):
                     collections_supported_by_gis_join[gis_join].append(collection_name)
                     found = True
 
-        print("Found:", found)
+                print(f"{collection}: Found {gis_join}: {found}")
 
     return db, collections_supported_by_gis_join
 
@@ -82,6 +84,14 @@ def intersects_with_collection(field, state_geo_document, collection):
     return found is not None
 
 
+def has_geometry_field(collection):
+    first_record = collection.find_one()
+    if first_record:
+        if "geometry" in first_record.keys():
+            return True
+    return False
+
+
 def get_gis_join_field(collection):
     first_record = collection.find_one()
     if first_record:
@@ -89,6 +99,10 @@ def get_gis_join_field(collection):
             return "GISJOIN"
         elif "gis_join" in first_record.keys():
             return "gis_join"
+        elif "gisJoin" in first_record.keys():
+            return "gisJoin"
+        elif "gisjoin" in first_record.keys():
+            return "gisjoin"
         elif "properties" in first_record.keys():
             if "GISJOIN" in first_record["properties"].keys():
                 return "properties.GISJOIN"
