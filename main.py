@@ -41,7 +41,7 @@ def search_collections_for_gis_joins(gis_joins):
                     collections_supported_by_gis_join[gis_join].append(collection_name)
                     found = True
 
-                print(f"{collection}: Found {gis_join}: {found}")
+                print(f"{collection_name}: Found {gis_join}: {found}")
 
         # No GISJOIN field, check $geoIntersects
         elif has_geometry_field(collection):
@@ -59,7 +59,7 @@ def search_collections_for_gis_joins(gis_joins):
                     collections_supported_by_gis_join[gis_join].append(collection_name)
                     found = True
 
-                print(f"{collection}: Found {gis_join}: {found}")
+                print(f"{collection_name}: Found {gis_join}: {found}")
 
     return db, collections_supported_by_gis_join
 
